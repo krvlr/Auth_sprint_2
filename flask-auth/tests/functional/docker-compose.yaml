@@ -1,0 +1,72 @@
+version: '3'
+
+networks:
+  test_movies_network:
+
+services:
+  test-db-auth:
+    image: postgres:13-alpine
+    container_name: test-db-auth
+    environment:
+      POSTGRES_DB: ${AUTH_DB_NAME}
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+    networks:
+      - test_movies_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $$AUTH_POSTGRES_DB -U $$AUTH_POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  test-redis-auth:
+    image: redis:7.0.8-alpine
+    container_name: test-redis-auth
+    networks:
+      - test_movies_network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+    ports:
+      - "6379:6379"
+
+  api-auth:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    container_name: test-api-auth
+    depends_on:
+      test-db-auth:
+        condition: service_healthy
+      test-redis-auth:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - test_movies_network
+    healthcheck:
+      test: curl --fail http://127.0.0.1:8000/api/v1/health || exit 1
+      interval: 10s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
+    ports:
+      - "8000:8000"
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tests
+    depends_on:
+      test-db-auth:
+        condition: service_healthy
+      test-redis-auth:
+        condition: service_healthy
+      api-auth:
+        condition: service_healthy
+    env_file:
+      - .env.tests
+    networks:
+      - test_movies_network

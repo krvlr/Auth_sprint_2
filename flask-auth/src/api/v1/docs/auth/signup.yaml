@@ -1,0 +1,31 @@
+Регистрация
+---
+description: Endpoint для регистрации пользователя в системе.
+tags:
+  - Сервис аутентификации.
+parameters:
+  - name: body
+    description: Тело запроса должно содержать все необходимые для регистрации данные.
+    in: body
+    required: true
+    schema:
+      type: object
+      required:
+        - "email"
+        - "password"
+        - "login"
+      properties:
+        email:
+          type: "email"
+          example: "kira@yandex.ru"
+        login:
+          type: string
+          example: "kira"
+        password:
+          type: string
+          example: "12345678"
+responses:
+  201:
+    description: Пользователь успешно прошел регистрацию.
+  400:
+    description: Произошла ошибка при регистрации пользователя.

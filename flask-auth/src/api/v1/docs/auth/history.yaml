@@ -1,0 +1,30 @@
+История действий
+---
+description: Endpoint для получения пользователем своей истории действий.
+tags:
+  - Сервис аутентификации.
+#security:
+#  - bearerAuth: []
+parameters:
+  - name: Authorization
+    in: header
+    description: В заголовке Authorization запроса должен присутствовать Access токен (Bearer <access_token>)
+    required: true
+    type: string
+  - name: page_size
+    in: path
+    description: Размер страницы
+    required: true
+    type: string
+  - name: page_num
+    in: path
+    description: Номер страницы
+    required: true
+    type: string
+responses:
+  200:
+    description: Пользователь успешно получил текущие Access и Refresh токены.
+  400:
+    description: Произошла ошибка при попытке сбросить Access и Refresh токены.
+  422:
+    description: Произошла ошибка валидации Access токена.
