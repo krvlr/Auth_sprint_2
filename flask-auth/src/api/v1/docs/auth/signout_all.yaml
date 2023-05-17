@@ -1,0 +1,20 @@
+Выход на всех устройствах
+---
+description: Endpoint для выхода пользователя из аккаунта на всех устроствах.
+tags:
+  - Сервис аутентификации.
+#security:
+#  - bearerAuth: []
+parameters:
+  - name: Authorization
+    in: header
+    description: В заголовке Authentication запроса должен присутствовать Access токен (Bearer <access_token>)
+    required: true
+    type: string
+responses:
+  200:
+    description: Пользователь успешно сбросил текущие Access и Refresh токены.
+  400:
+    description: Произошла ошибка при попытке сбросить Access и Refresh токены.
+  422:
+    description: Произошла ошибка валидации Access токена.

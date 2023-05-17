@@ -1,0 +1,20 @@
+Обновление Access токена
+---
+description: Endpoint для обновления Access токена пользователя в системе.
+tags:
+  - Сервис аутентификации.
+#security:
+#  - bearerAuth: []
+parameters:
+  - name: Authorization
+    in: header
+    description: В заголовке Authorization запроса должен присутствовать Refresh токен (Bearer <refresh_token>)
+    required: true
+    type: string
+responses:
+  200:
+    description: Пользователь успешно обновил Access токен.
+  400:
+    description: Произошла ошибка при попытке обновить Access токен.
+  422:
+    description: Произошла ошибка валидации Refresh токена.

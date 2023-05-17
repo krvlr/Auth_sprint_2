@@ -1,0 +1,175 @@
+version: '3'
+
+volumes:
+  auth_postgres_data:
+  auth_redis_data:
+  postgres_data:
+  redis_data:
+  elasticsearch_data:
+
+networks:
+  movies_network:
+
+services:
+  db:
+    image: postgres:13-alpine
+    container_name: db-movies
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./db/movies_database.sql:/docker-entrypoint-initdb.d/movies_database.sql
+    networks:
+      - movies_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    expose:
+      - "5432"
+
+  redis:
+    image: redis:7.0.8-alpine
+    container_name: redis-movies
+    restart: always
+    volumes:
+      - redis_data:/data
+    networks:
+      - movies_network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+    expose:
+      - "6379"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
+    container_name: elasticsearch-movies
+    restart: always
+    environment:
+      - "discovery.type=single-node"
+      - "xpack.security.enabled=false"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - movies_network
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    expose:
+      - "9200"
+
+  etl:
+    build:
+      context: .
+      dockerfile: postgres_to_es/Dockerfile
+    container_name: etl-movies
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - movies_network
+
+  api:
+    build:
+      context: ./fastapi-solution
+      dockerfile: Dockerfile
+    container_name: api-movies
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - movies_network
+    expose:
+      - "8000"
+
+  db-auth:
+    image: postgres:13-alpine
+    container_name: db-auth
+    restart: always
+    environment:
+      POSTGRES_DB: ${AUTH_DB_NAME}
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+    volumes:
+      - auth_postgres_data:/var/lib/postgresql/data/
+    networks:
+      - movies_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $$AUTH_POSTGRES_DB -U $$AUTH_POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    expose:
+      - "5432"
+
+  redis-auth:
+    image: redis:7.0.8-alpine
+    container_name: redis-auth
+    restart: always
+    volumes:
+      - auth_redis_data:/data
+    networks:
+      - movies_network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+    expose:
+      - "6379"
+
+  api-auth:
+    build:
+      context: ./flask-auth
+      dockerfile: Dockerfile
+    container_name: api-auth
+    restart: always
+    depends_on:
+      db-auth:
+        condition: service_healthy
+      redis-auth:
+        condition: service_healthy
+    env_file:
+      - .env
+    healthcheck:
+      test: curl --fail http://127.0.0.1:8000/api/v1/health || exit 1
+      interval: 10s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
+    networks:
+      - movies_network
+    expose:
+      - "8000"
+
+  nginx:
+    image: nginx:1.23.1-alpine
+    container_name: nginx-movies
+    restart: always
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      api-auth:
+        condition: service_healthy
+    networks:
+      - movies_network
+    ports:
+      - "80:80"

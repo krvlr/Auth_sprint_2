@@ -1,0 +1,31 @@
+Выход из аккаунта
+---
+description: Endpoint для выхода пользователя из аккаунта.
+tags:
+  - Сервис аутентификации.
+#security:
+#  - bearerAuth: []
+parameters:
+  - name: body
+    description: В теле запроса необходимо указать Refresh токен.
+    in: body
+    required: true
+    schema:
+      type: object
+      required:
+        - "refresh_token"
+      properties:
+        refresh_token:
+          type: string
+  - name: Authorization
+    in: header
+    description: В заголовке Authorization запроса должен присутствовать Access токен (Bearer <access_token>)
+    required: true
+    type: string
+responses:
+  200:
+    description: Пользователь успешно сбросил текущие Access и Refresh токены.
+  400:
+    description: Произошла ошибка при попытке сбросить Access и Refresh токены.
+  422:
+    description: Произошла ошибка валидации Access токена.
