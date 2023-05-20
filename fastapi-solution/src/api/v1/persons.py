@@ -3,8 +3,10 @@ from dataclasses import asdict
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+
 from models.person import PersonBrief, PersonDetail, PersonFilters
 from models.shared import Paginator
+from services.auth import JWTBearerPremium
 from services.persons import PersonService, get_person_service
 
 logger = logging.getLogger(__name__)
@@ -38,7 +40,7 @@ async def person_list(
     )
 
 
-@router.get("/{person_id}", response_model=PersonDetail)
+@router.get("/{person_id}", dependencies=[Depends(JWTBearerPremium())], response_model=PersonDetail)
 async def person_details(
     person_id: str, person_service: PersonService = Depends(get_person_service)
 ) -> PersonDetail:

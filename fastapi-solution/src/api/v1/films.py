@@ -3,8 +3,10 @@ from dataclasses import asdict
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+
 from models.film import FilmBrief, FilmDetail, FilmFilters
 from models.shared import Paginator
+from services.auth import JWTBearerPremium
 from services.films import FilmService, get_film_service
 
 logger = logging.getLogger(__name__)
@@ -38,7 +40,7 @@ async def film_list(
     )
 
 
-@router.get("/{film_id}", response_model=FilmDetail)
+@router.get("/{film_id}", dependencies=[Depends(JWTBearerPremium())], response_model=FilmDetail)
 async def film_details(
     film_id: str, film_service: FilmService = Depends(get_film_service)
 ) -> FilmDetail:
