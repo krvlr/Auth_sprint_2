@@ -1,4 +1,8 @@
+from http import HTTPStatus
+
 from gevent import monkey
+from jaeger_config import configure_jaeger_tracer
+from models.common import BaseResponse
 
 monkey.patch_all()
 
@@ -9,12 +13,12 @@ import logging.config
 from datetime import timedelta
 
 from api.v1 import auth_handler
-from core.config import flask_settings, jwt_settings, role_settings
+from core.config import flask_settings, jwt_settings, role_settings, jaeger_settings
 from core.logger import LOGGER_CONFIG
 from db import init_db, alchemy
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager
-from flasgger import Swagger, LazyString, LazyJSONEncoder
+from flasgger import Swagger
 from config.swagger import template, swagger_config
 
 logging.config.dictConfig(LOGGER_CONFIG)
@@ -22,6 +26,8 @@ logging.config.dictConfig(LOGGER_CONFIG)
 
 def create_app():
     app = Flask(__name__)
+
+    configure_jaeger_tracer(app, jaeger_settings.host, jaeger_settings.port)
 
     Swagger(app, template=template, config=swagger_config)
 
@@ -32,6 +38,19 @@ def create_app():
     app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(hours=jwt_settings.refresh_token_expires)
 
     add_base_exceptions_handlers(app)
+
+    @app.before_request
+    def before_request():
+        request_id = request.headers.get("X-Request-Id")
+        if not request_id:
+            return (
+                jsonify(
+                    BaseResponse(
+                        success=False, error="Ошибка формата входных данных. Отсутствует request id"
+                    ).dict()
+                ),
+                HTTPStatus.BAD_REQUEST,
+            )
 
     jwt = JWTManager(app)
 

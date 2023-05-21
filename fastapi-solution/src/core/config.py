@@ -23,6 +23,15 @@ class Settings(BaseSettings):
         env_file = ".env"
 
 
+class JaegerSettings(BaseSettings):
+    host: str = Field(default="127.0.0.1", env="JAEGER_HOST")
+    port: int = Field(default=6831, env="JAEGER_PORT")
+
+    class Config:
+        env_file = ".env"
+
+
 settings = Settings()
+jaeger_settings = JaegerSettings()
 
 log_level = logging.DEBUG if settings.debug_log_level else logging.INFO
