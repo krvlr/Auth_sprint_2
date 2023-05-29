@@ -17,6 +17,7 @@ class Settings(BaseSettings):
         default="%(asctime)s - %(name)s - %(levelname)s - %(message)s", env="LOG_FORMAT"
     )
     log_default_handlers = ["console"]
+    secret_key: str = Field(default="SUPER-SECRET-KEY", env="JWT_SECRET_KEY")
 
     class Config:
         env_file = ".env"

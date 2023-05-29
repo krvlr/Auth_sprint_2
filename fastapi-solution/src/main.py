@@ -1,13 +1,13 @@
 import uvicorn
-from api.v1 import films, genres, persons
-from core import config
-from core.config import settings
-from core.logger import get_logging_config_dict
 from elasticsearch import AsyncElasticsearch
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from redis.asyncio import Redis
 
+from api.v1 import films, genres, persons
+from core import config
+from core.config import settings
+from core.logger import get_logging_config_dict
 from db import elastic, redis
 
 app = FastAPI(
@@ -21,9 +21,7 @@ app = FastAPI(
 @app.on_event("startup")
 async def startup():
     redis.redis = Redis(host=settings.redis_host, port=settings.redis_port)
-    elastic.es = AsyncElasticsearch(
-        hosts=[f"{settings.elastic_host}:{settings.elastic_port}"]
-    )
+    elastic.es = AsyncElasticsearch(hosts=[f"{settings.elastic_host}:{settings.elastic_port}"])
 
 
 @app.on_event("shutdown")

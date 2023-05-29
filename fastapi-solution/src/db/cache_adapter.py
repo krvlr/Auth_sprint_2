@@ -2,13 +2,13 @@ from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
 from inspect import signature
+
+from redis.asyncio import Redis
 from typing import Any, Callable
 
 from core.config import settings
 from db.base_cache import CacheAdapter, CacheProvider
-from db.redis import RedisProvider, get_redis_cache_provider
-from fastapi import Depends
-from redis.asyncio import Redis
+from db.redis import RedisProvider
 from utils.cache_serializer import PickleCacheSerializer
 
 
@@ -37,9 +37,7 @@ class RedisAdapter(CacheAdapter):
     async def set(self, cache_key: str, data: Any) -> Any:
         """Method for save data in cache."""
         cache_data = CacheData(saved_datetime=datetime.now(), data=data)
-        await self.cache_provider.set(
-            cache_key, PickleCacheSerializer.serialize(cache_data)
-        )
+        await self.cache_provider.set(cache_key, PickleCacheSerializer.serialize(cache_data))
 
     async def get(self, cache_key: str, expire: int) -> Any:
         """Method for load data in cache."""
