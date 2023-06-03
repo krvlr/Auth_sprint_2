@@ -22,6 +22,7 @@ from utils.exceptions import (
     AccountSignoutException,
     AccountSignupException,
 )
+from utils.rate_limit import limit_leaky_bucket
 from utils.user_action import log_action
 from flasgger import swag_from
 
@@ -80,6 +81,7 @@ def signin():
 
 @auth_bp.route("/api/v1/refresh", methods=["POST"])
 @jwt_required(refresh=True)
+@limit_leaky_bucket
 @log_action
 @swag_from("docs/auth/refresh.yaml")
 def refresh():
@@ -111,6 +113,7 @@ def refresh():
 
 @auth_bp.route("/api/v1/password/change", methods=["POST"])
 @jwt_required()
+@limit_leaky_bucket
 @log_action
 @swag_from("docs/auth/password_change.yaml")
 def password_change():
@@ -136,6 +139,7 @@ def password_change():
 
 @auth_bp.route("/api/v1/signout", methods=["POST"])
 @jwt_required()
+@limit_leaky_bucket
 @log_action
 @swag_from("docs/auth/signout.yaml")
 def signout():
@@ -158,6 +162,7 @@ def signout():
 
 @auth_bp.route("/api/v1/signout/all", methods=["POST"])
 @jwt_required()
+@limit_leaky_bucket
 @log_action
 @swag_from("docs/auth/signout_all.yaml")
 def signout_all():
@@ -174,6 +179,7 @@ def signout_all():
 
 @auth_bp.route("/api/v1/history", methods=["GET"])
 @jwt_required()
+@limit_leaky_bucket
 @swag_from("docs/auth/history.yaml")
 def history():
     try:

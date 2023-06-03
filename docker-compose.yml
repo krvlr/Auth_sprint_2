@@ -64,7 +64,6 @@ services:
       retries: 5
     expose:
       - "9200"
-      - "9200"
 
   etl:
     build:
