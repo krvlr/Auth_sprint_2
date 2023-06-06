@@ -64,7 +64,6 @@ services:
       retries: 5
     expose:
       - "9200"
-      - "9200"
 
   etl:
     build:
@@ -162,7 +161,7 @@ services:
       - "8000"
 
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/all-in-one:1.20.0
     container_name: jaeger
     restart: always
     volumes:
@@ -180,7 +179,7 @@ services:
     ports:
       - "6831:6831/udp"
       - "16686:16686"
-      - "16685:16685"
+#      - "16685:16685"
 
   nginx:
     image: nginx:1.23.1-alpine

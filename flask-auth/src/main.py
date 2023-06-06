@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 from gevent import monkey
-from jaeger_config import configure_jaeger_tracer
+from utils.jaeger_config import configure_jaeger_tracer
 from models.common import BaseResponse
 
 monkey.patch_all()
