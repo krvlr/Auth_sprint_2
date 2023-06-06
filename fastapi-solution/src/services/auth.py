@@ -20,12 +20,10 @@ class SubRequiredFields(BaseModel):
 
 class JWTBearerPremium(HTTPBearer):
     def __init__(self, auto_error: bool = True):
-        super(JWTBearerPremium, self).__init__(auto_error=auto_error)
+        super().__init__(auto_error=auto_error)
 
     async def __call__(self, request: Request):
-        credentials: HTTPAuthorizationCredentials = await super(JWTBearerPremium, self).__call__(
-            request
-        )
+        credentials: HTTPAuthorizationCredentials = await super().__call__(request)
         if not credentials:
             raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Неверный код")
 
@@ -45,6 +43,9 @@ class JWTBearerPremium(HTTPBearer):
         except Exception as ex:
             logger.exception("Ошибка проверки JWT токена")
             raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Неверный JWT токен")
+
+        if not decoded_token.get("type") == "access":
+            raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Тип токена не access")
 
         if not self.is_authorized_account(decoded_token):
             raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Нет прав доступа")
