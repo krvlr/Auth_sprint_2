@@ -73,9 +73,18 @@ class RoleSettings(BaseSettings):
         env_file = ".env"
 
 
+class JaegerSettings(BaseSettings):
+    host: str = Field(default="127.0.0.1", env="JAEGER_HOST")
+    port: int = Field(default=6831, env="JAEGER_PORT")
+
+    class Config:
+        env_file = ".env"
+
+
 logger_settings = LoggerSettings()
 flask_settings = FlaskSettings()
 postgre_settings = PostgreSettings()
 redis_settings = RedisSettings()
 jwt_settings = JWTSettings()
 role_settings = RoleSettings()
+jaeger_settings = JaegerSettings()

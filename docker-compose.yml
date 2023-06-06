@@ -6,6 +6,7 @@ volumes:
   postgres_data:
   redis_data:
   elasticsearch_data:
+  jaeger_volume:
 
 networks:
   movies_network:
@@ -149,7 +150,7 @@ services:
     env_file:
       - .env
     healthcheck:
-      test: curl --fail http://127.0.0.1:8000/api/v1/health || exit 1
+      test: "curl -H 'X-Request-Id: ${AUTH_HEALTHCHECK_REQUEST_ID}' --fail http://127.0.0.1:8000/api/v1/health || exit 1"
       interval: 10s
       timeout: 10s
       start_period: 10s
@@ -158,6 +159,27 @@ services:
       - movies_network
     expose:
       - "8000"
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.20.0
+    container_name: jaeger
+    restart: always
+    volumes:
+      - jaeger_volume:/badger
+    environment:
+      - SPAN_STORAGE_TYPE=badger
+      - BADGER_EPHEMERAL=false
+      - BADGER_DIRECTORY_VALUE=/badger/data
+      - BADGER_DIRECTORY_KEY=/badger/key
+    depends_on:
+      api-auth:
+        condition: service_healthy
+    networks:
+      - movies_network
+    ports:
+      - "6831:6831/udp"
+      - "16686:16686"
+#      - "16685:16685"
 
   nginx:
     image: nginx:1.23.1-alpine

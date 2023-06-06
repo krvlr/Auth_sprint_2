@@ -46,7 +46,7 @@ services:
     networks:
       - test_movies_network
     healthcheck:
-      test: curl --fail http://127.0.0.1:8000/api/v1/health || exit 1
+      test: "curl -H 'X-Request-Id: ${AUTH_HEALTHCHECK_REQUEST_ID}' --fail http://127.0.0.1:8000/api/v1/health || exit 1"
       interval: 10s
       timeout: 10s
       start_period: 10s
