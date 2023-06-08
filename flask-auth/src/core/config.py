@@ -14,10 +14,11 @@ class LoggerSettings(BaseSettings):
     default_handlers: list = ["console"]
 
 
-class FlaskSettings(BaseSettings):
+class CommonSettings(BaseSettings):
     debug: bool = Field(default=True)
     host: str = Field(default="0.0.0.0")
     port: str = Field(default="8000")
+    request_limit_per_minute: int = Field(default=20, env="REQUEST_LIMIT_PER_MINUTE")
 
     class Config:
         env_file = ".env"
@@ -82,7 +83,7 @@ class JaegerSettings(BaseSettings):
 
 
 logger_settings = LoggerSettings()
-flask_settings = FlaskSettings()
+common_settings = CommonSettings()
 postgre_settings = PostgreSettings()
 redis_settings = RedisSettings()
 jwt_settings = JWTSettings()

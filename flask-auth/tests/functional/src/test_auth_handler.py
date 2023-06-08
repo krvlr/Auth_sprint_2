@@ -1,8 +1,8 @@
-import json
+from collections import defaultdict
 from http import HTTPStatus
+
 import pytest
 from utils.helpers import get_cookies
-from collections import defaultdict
 
 
 @pytest.mark.parametrize(

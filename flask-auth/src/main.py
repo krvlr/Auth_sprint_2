@@ -1,8 +1,9 @@
 from http import HTTPStatus
 
 from gevent import monkey
-from utils.jaeger_config import configure_jaeger_tracer
+
 from models.common import BaseResponse
+from utils.jaeger_config import configure_jaeger_tracer
 
 monkey.patch_all()
 
@@ -13,7 +14,8 @@ import logging.config
 from datetime import timedelta
 
 from api.v1 import auth_handler
-from core.config import flask_settings, jwt_settings, role_settings, jaeger_settings
+from core.config import jaeger_settings
+from core.config import common_settings, jwt_settings, role_settings
 from core.logger import LOGGER_CONFIG
 from db import init_db, alchemy
 from flask import Flask, request, jsonify
@@ -90,7 +92,7 @@ def initial_create():
 if __name__ == "__main__":
     initial_create()
     app.run(
-        host=flask_settings.host,
-        port=flask_settings.port,
-        debug=flask_settings.debug,
+        host=common_settings.host,
+        port=common_settings.port,
+        debug=common_settings.debug,
     )

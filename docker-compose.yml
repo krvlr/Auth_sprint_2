@@ -179,7 +179,6 @@ services:
     ports:
       - "6831:6831/udp"
       - "16686:16686"
-#      - "16685:16685"
 
   nginx:
     image: nginx:1.23.1-alpine
