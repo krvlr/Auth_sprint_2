@@ -7,7 +7,7 @@ from db import elastic, redis
 from elasticsearch import AsyncElasticsearch
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
-from jaeger_config import configure_jaeger_tracer
+from utils.jaeger_config import configure_jaeger_tracer
 from redis.asyncio import Redis
 
 app = FastAPI(

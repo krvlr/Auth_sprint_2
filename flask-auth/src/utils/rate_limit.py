@@ -23,7 +23,7 @@ def limit_leaky_bucket(func):
 
         pipe = redis_rate_limit_conn.pipeline()
         now = datetime.datetime.now()
-        key = f'{jti["sub"]}:{now.minute}'
+        key = f'{jti["sub"]["id"]}:{now.minute}'
         pipe.incr(key, 1)
         pipe.expire(key, 59)
         result = pipe.execute()
