@@ -44,7 +44,6 @@ class ElasticAdapter(DbAdapter):
         logger.info(f"In ElasticAdapter method search, query = {query}")
 
         if query:
-
             body = {"query": {"bool": {"must": {}}}}
 
             for _query in query.split(","):
@@ -74,18 +73,14 @@ class ElasticAdapter(DbAdapter):
 
         return [model(**doc["_source"]) for doc in docs["hits"]["hits"]]
 
-    def _make_sort_string(
-        self, sort_fields: list[str] | None, model: Type[BaseModel]
-    ) -> str:
+    def _make_sort_string(self, sort_fields: list[str] | None, model: Type[BaseModel]) -> str:
         if sort_fields is None:
             return "id:desc"
 
         prepared_sort_fields = []
         for field in sort_fields:
             sort_order = (
-                SortingOrder.DESC.value
-                if field.startswith("-")
-                else SortingOrder.ASC.value
+                SortingOrder.DESC.value if field.startswith("-") else SortingOrder.ASC.value
             )
             sort_by = field.strip("-")
             if sort_by in model.__fields__ and sort_by in self.allowed_sort_fields:
@@ -96,9 +91,7 @@ class ElasticAdapter(DbAdapter):
         logger.info(f"Elastic sorting: {','.join(prepared_sort_fields)}")
         return ",".join(prepared_sort_fields)
 
-    def _add_query_filters(
-        self, query: dict, filters: dict, model: Type[BaseModel]
-    ) -> dict:
+    def _add_query_filters(self, query: dict, filters: dict, model: Type[BaseModel]) -> dict:
         query_filters = list()
 
         for filter_field, values in filters.items():

@@ -3,7 +3,6 @@ from dataclasses import asdict
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-
 from models.film import FilmBrief, FilmDetail, FilmFilters
 from models.shared import Paginator
 from services.auth import JWTBearerPremium

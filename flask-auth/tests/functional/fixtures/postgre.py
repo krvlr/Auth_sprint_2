@@ -1,8 +1,7 @@
 import pytest_asyncio
+from settings import postgre_settings
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
-
-from settings import postgre_settings
 
 
 async def _delete_from_tables(engine):

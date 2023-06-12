@@ -2,13 +2,12 @@ from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
 from inspect import signature
-
-from redis.asyncio import Redis
 from typing import Any, Callable
 
 from core.config import settings
 from db.base_cache import CacheAdapter, CacheProvider
 from db.redis import RedisProvider
+from redis.asyncio import Redis
 from utils.cache_serializer import PickleCacheSerializer
 
 

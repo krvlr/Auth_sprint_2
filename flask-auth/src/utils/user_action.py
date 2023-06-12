@@ -3,12 +3,13 @@ from functools import wraps
 from http import HTTPStatus
 from typing import Callable
 
-from db import alchemy
 from db.models.user import UserActionsHistory
 from flask import request
 from flask.json import loads
 from flask_jwt_extended import current_user, decode_token
 from werkzeug.http import parse_cookie
+
+from db import alchemy
 
 logger = logging.getLogger(__name__)
 

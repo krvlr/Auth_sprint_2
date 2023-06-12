@@ -15,7 +15,7 @@ template = {
             "type": "apiKey",
             "name": "Authorization",
             "in": "header",
-            "description": "Заголовок авторизации JWT с использованием схемы Bearer. "
+            "description": "Заголовок авторизации JWT с использованием схемы Bearer."
             'Пример: "Authorization: Bearer {token}"',
         }
     },

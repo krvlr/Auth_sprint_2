@@ -2,9 +2,13 @@ import traceback
 from http import HTTPStatus
 
 from flask import jsonify
-from werkzeug.exceptions import UnprocessableEntity, UnsupportedMediaType
-
 from models.common import BaseResponse
+from werkzeug.exceptions import (
+    Forbidden,
+    MethodNotAllowed,
+    UnprocessableEntity,
+    UnsupportedMediaType,
+)
 
 
 def add_base_exceptions_handlers(app):
@@ -13,15 +17,37 @@ def add_base_exceptions_handlers(app):
         app.logger.error(msg=ex.description)
         return (
             jsonify(BaseResponse(success=False, error="Ошибка формата входных данных.").dict()),
-            HTTPStatus.BAD_REQUEST,
+            HTTPStatus.UNPROCESSABLE_ENTITY,
         )
 
     @app.errorhandler(UnsupportedMediaType)
-    def unprocessable_media_type(ex: UnsupportedMediaType):
+    def unsupported_media_type(ex: UnsupportedMediaType):
         app.logger.error(msg=ex.description)
         return (
             jsonify(BaseResponse(success=False, error="Ошибка состава запроса.").dict()),
-            HTTPStatus.BAD_REQUEST,
+            HTTPStatus.UNSUPPORTED_MEDIA_TYPE,
+        )
+
+    @app.errorhandler(MethodNotAllowed)
+    def method_not_allowed(ex: MethodNotAllowed):
+        app.logger.error(msg=ex.description)
+        return (
+            jsonify(
+                BaseResponse(success=False, error="Метод не разрешен для запрошенного URL.").dict()
+            ),
+            HTTPStatus.METHOD_NOT_ALLOWED,
+        )
+
+    @app.errorhandler(Forbidden)
+    def forbidden(ex: Forbidden):
+        app.logger.error(msg=ex.description)
+        return (
+            jsonify(
+                BaseResponse(
+                    success=False, error="Доступ запрещен, требуются админские права!"
+                ).dict()
+            ),
+            HTTPStatus.FORBIDDEN,
         )
 
     @app.errorhandler(Exception)
@@ -67,4 +93,48 @@ class AccountHistoryException(Exception):
     def __init__(self, error_message: str):
         self.error_message = (
             f"Ошибка при попытке получения истории действий пользователя. {error_message}"
+        )
+
+
+class AccountCreateRoleException(Exception):
+    def __init__(self, error_message: str):
+        self.error_message = f"Ошибка при попытке создания подписки. {error_message}"
+
+
+class AccountRoleDetailsException(Exception):
+    def __init__(self, error_message: str):
+        self.error_message = f"Ошибка при попытке получения информации о подписке. {error_message}"
+
+
+class AccountRolesDetailsException(Exception):
+    def __init__(self, error_message: str):
+        self.error_message = (
+            f"Ошибка при попытке получения информации о всех доступных подписках. {error_message}"
+        )
+
+
+class AccountDeleteRoleException(Exception):
+    def __init__(self, error_message: str):
+        self.error_message = f"Ошибка при попытке удаления подписки. {error_message}"
+
+
+class AccountModifiedRoleException(Exception):
+    def __init__(self, error_message: str):
+        self.error_message = f"Ошибка при попытке изменения подписки. {error_message}"
+
+
+class AccountAddUserRoleException(Exception):
+    def __init__(self, error_message: str):
+        self.error_message = f"Ошибка при попытке выдачи пользователю подписки. {error_message}"
+
+
+class AccountDeleteUserRoleException(Exception):
+    def __init__(self, error_message: str):
+        self.error_message = f"Ошибка при попытке удаления подписки у пользователя. {error_message}"
+
+
+class AccountCheckUserRoleException(Exception):
+    def __init__(self, error_message: str):
+        self.error_message = (
+            f"Ошибка при попытке проверки наличия подписки у пользователя. {error_message}"
         )

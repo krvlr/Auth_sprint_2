@@ -42,4 +42,3 @@ class ESGenreData(BaseModel):
     id: str
     name: str
     description: str | None
-

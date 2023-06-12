@@ -2,12 +2,11 @@ import datetime
 from functools import wraps
 from http import HTTPStatus
 
+from core.config import common_settings, redis_settings
 from flask import jsonify
 from flask_jwt_extended import get_jwt
-from redis import Redis
-
-from core.config import redis_settings, common_settings
 from models.common import BaseResponse
+from redis import Redis
 
 redis_rate_limit_conn = Redis(
     host=redis_settings.host,

@@ -4,7 +4,6 @@ from typing import Iterable
 
 import pytest_asyncio
 from elasticsearch import AsyncElasticsearch
-
 from settings import test_settings
 from testdata.schemes.es_schema import INDEXES
 
@@ -49,6 +48,6 @@ def es_write_data(es_client: AsyncElasticsearch):
         bulk_query = _get_es_bulk_query(es_index, data)
         response = await es_client.bulk(bulk_query, refresh=True)
         if response["errors"]:
-            raise Exception(f"Ошибка записи данных в Elasticsearch")
+            raise Exception("Ошибка записи данных в Elasticsearch")
 
     return inner

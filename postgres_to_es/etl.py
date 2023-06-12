@@ -7,8 +7,7 @@ from elasticsearch_loader import ElasticsearchLoader
 from es_schema import GENRES_INDEX, MOVIES_INDEX, PERSONS_INDEX
 from loguru import logger
 from models import ESFilmworkData, ESGenreData, ESPersonData
-from postgres_extractor import (FILMWORKS_QUERY, GENRES_QUERY, PERSONS_QUERY,
-                                PostgresExtractor)
+from postgres_extractor import FILMWORKS_QUERY, GENRES_QUERY, PERSONS_QUERY, PostgresExtractor
 from pydantic import BaseModel
 from settings import ETL_REPEAT_INTERVAL_TIME_SEC, REDIS_ADAPTER
 from state import RedisStorage, State
