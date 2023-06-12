@@ -41,7 +41,6 @@ def signup():
             email=body.email,
             password=body.password,
         )
-        current_app.logger.info(f"user_data = {user_data}")
         return jsonify(BaseResponse(data=user_data).dict()), HTTPStatus.CREATED
     except AccountSignupException as ex:
         return (
