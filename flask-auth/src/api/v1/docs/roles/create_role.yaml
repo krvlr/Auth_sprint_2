@@ -1,0 +1,38 @@
+Создание подписки
+---
+description: Endpoint для создания новых подписок.
+tags:
+  - Сервис управления подписками.
+parameters:
+  - name: body
+    description: Тело запроса должно содержать все необходимые для создания подписки данные.
+    in: body
+    required: true
+    schema:
+      type: object
+      required:
+        - "name"
+        - "description"
+      properties:
+        name:
+          type: string
+          example: "super-prime"
+        description:
+          type: string
+          example: "Super-puper-default subscription for gey-gunners!"
+  - name: Authorization
+    in: header
+    description: В заголовке Authorization запроса должен присутствовать Access токен (Bearer <access_token>)
+    required: true
+    type: string
+responses:
+  200:
+    description: Администратор успешно создал новую подписку.
+  400:
+    description: Произошла ошибка при попытке создать новую подписку.
+  403:
+    description: Отсутствуют права администратора.
+  415:
+    description: Ошибка формата входных данных.
+  422:
+    description: Ошибка состава запроса.

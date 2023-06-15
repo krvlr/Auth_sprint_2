@@ -1,11 +1,11 @@
 from functools import lru_cache
 
-from db import alchemy
-from db.models.user import UserActionsHistory
-from db.models.user import User, Role
+from core.config import role_settings
+from db.models.user import Role, User, UserActionsHistory
 from db.token_storage_adapter import TokenStatus, TokenStorageAdapter, get_redis_adapter
 from flask import current_app, request
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jti
+from models.auth_models import JwtPayload
 from utils.exceptions import (
     AccountHistoryException,
     AccountPasswordChangeException,
@@ -15,8 +15,8 @@ from utils.exceptions import (
     AccountSignoutException,
     AccountSignupException,
 )
-from models.auth_models import JwtPayload
-from core.config import role_settings
+
+from db import alchemy
 
 
 class AuthService:

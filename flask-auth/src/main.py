@@ -1,27 +1,24 @@
-from http import HTTPStatus
-
 from gevent import monkey
-
-from models.common import BaseResponse
-from utils.jaeger_config import configure_jaeger_tracer
 
 monkey.patch_all()
 
-from db.models.user import User, Role
-from utils.exceptions import add_base_exceptions_handlers
-
 import logging.config
 from datetime import timedelta
+from http import HTTPStatus
 
-from api.v1 import auth_handler
-from core.config import jaeger_settings
-from core.config import common_settings, jwt_settings, role_settings
+from api.v1 import auth_handlers, role_handlers
+from config.swagger import swagger_config, template
+from core.config import common_settings, jaeger_settings, jwt_settings, role_settings
 from core.logger import LOGGER_CONFIG
-from db import init_db, alchemy
-from flask import Flask, request, jsonify
-from flask_jwt_extended import JWTManager
+from db.models.user import Role, User
 from flasgger import Swagger
-from config.swagger import template, swagger_config
+from flask import Flask, jsonify, request
+from flask_jwt_extended import JWTManager
+from models.common import BaseResponse
+from utils.exceptions import add_base_exceptions_handlers
+from utils.jaeger_config import configure_jaeger_tracer
+
+from db import alchemy, init_db
 
 logging.config.dictConfig(LOGGER_CONFIG)
 
@@ -66,23 +63,15 @@ def create_app():
 
 
 app = create_app()
-app.register_blueprint(auth_handler.auth_bp)
-
+app.register_blueprint(auth_handlers.auth_bp)
+app.register_blueprint(role_handlers.role_bp)
 
 app.app_context().push()
-# это можно было использовать вместо alembic миграций
-# что в свою очередь сэкономило бы тонну времени
-# alchemy.create_all()
 
 
 @app.before_first_request
 def initial_create():
     for role_name, role_description in role_settings.get_initial_roles():
-        # функциональности по upsert в sqlalchemy не нашел
-        # если честно так и не понял в чем кайф всех этих миграций
-        # кучи времени на описание таблиц,
-        # поисков зацикленных ипортов,
-        # когда есть psycopg2 и SQL
         if not Role.query.filter_by(name=role_name).first():
             role = Role(name=role_name, description=role_description)
             alchemy.session.add(role)

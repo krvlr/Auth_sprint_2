@@ -2,12 +2,11 @@ import logging
 from http import HTTPStatus
 
 import jwt
-from fastapi import Request, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from core.config import settings
+from fastapi import HTTPException, Request
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import ExpiredSignatureError
 from pydantic import BaseModel, Field, ValidationError
-
-from core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -36,11 +35,11 @@ class JWTBearerPremium(HTTPBearer):
                 settings.secret_key,
                 algorithms=["HS256"],
             )
-        except ExpiredSignatureError as ex:
+        except ExpiredSignatureError:
             raise HTTPException(
                 status_code=HTTPStatus.UNAUTHORIZED, detail="Истек срок действия JWT access токена"
             )
-        except Exception as ex:
+        except Exception:
             logger.exception("Ошибка проверки JWT токена")
             raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Неверный JWT токен")
 

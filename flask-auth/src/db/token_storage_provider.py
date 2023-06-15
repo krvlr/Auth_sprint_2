@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from datetime import timedelta
+from typing import Any, Union
 
 from redis import Redis
-from typing import Any, Union
 
 
 class TokenStorageProvider(ABC):

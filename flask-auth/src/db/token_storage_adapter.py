@@ -2,12 +2,11 @@ from abc import ABC, abstractmethod
 from datetime import timedelta
 from enum import Enum
 from functools import lru_cache
-
-from redis import Redis
 from typing import Union
 
 from core.config import redis_settings
 from db.token_storage_provider import TokenStorageProvider, TokenStorageRedisProvider
+from redis import Redis
 
 
 class TokenStatus(Enum):

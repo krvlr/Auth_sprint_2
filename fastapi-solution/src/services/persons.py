@@ -16,12 +16,8 @@ class PersonService:
         self.db_adapter = db_adapter
 
     @cache()
-    async def get_by_id(
-        self, obj_id: str, model_cls=PersonDetail
-    ) -> PersonDetail | None:
-        return await self.db_adapter.get_object_by_id(
-            obj_id, ObjectName.PERSONS, model_cls
-        )
+    async def get_by_id(self, obj_id: str, model_cls=PersonDetail) -> PersonDetail | None:
+        return await self.db_adapter.get_object_by_id(obj_id, ObjectName.PERSONS, model_cls)
 
     @cache()
     async def get_list(

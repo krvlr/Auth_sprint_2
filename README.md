@@ -6,6 +6,8 @@ https://github.com/krvlr/Auth_sprint_2
 В рамках данного репозитория реализованы следующие сервисы:
 
 - Сервис авторизации
+- Сервис получения информации о фильмах
+- Сервис для управления подписками
 
 В рамках сервиса авторизации реализованы следующие `endpoint`-ы:
 
@@ -17,17 +19,33 @@ https://github.com/krvlr/Auth_sprint_2
 - `/api/v1/signout/all` - выход из устройства аутентифицированным пользователем (при наличии свежего `Acccess` токена).
 - `/api/v1/history` - получение списка действий текущего аутентифицированного пользователя (при наличии свежего `Acccess` токена).
 
-В рамках онлайн-кинотеатра предусмотрена система подписок. 
+В рамках сервиса управления подписками реализованы следующие `endpoint`-ы:
+
+- `/api/v1/roles/create_role` - создание подписки,
+- `/api/v1/roles/delete_role/<name>` - удаление подписки,
+- `/api/v1/roles/role_details/<name>` - получение информации по подписке,
+- `/api/v1/roles/roles_details` - получение информации по всем актуальным подпискам,
+- `/api/v1/roles/modified_role/<name>` - изменение подписки,
+- `/api/v1/roles/add_user_role/<name>` - добавление подписки пользователю,
+- `/api/v1/roles/delete_user_role/<name>` - удаление подписки у пользователя,
+- `/api/v1/roles/check_user_role/<name>` - проверка наличия подписки у пользователя.
+
+В рамках сервиса получения информации о фильмах реализованы следующие `endpoint`-ы:
+
+- TBD
+
+В рамках онлайн-кинотеатра предусмотрена система подписок. При регистрации пользователю выдается `default` подписка.
+
 Cервис авторизации предоставляет возможность аутентифицировать и авторизовать клиента с помощью активного `Access` токена.  
-Для этого, в `payload` токена зашиты: 
+Для возможности проверить права пользователя на получение доступа к определенному контенту, в `payload` токена заложены: 
 - Права и роль пользователя, 
-- Дополнительная информация.
+- Список активных подписок.
 
 При наличии секретного ключа, необходимого для проверки подписи активного `Access`-токена, каждый из микросервисов онлайн-кинотеатра сможет аутентифицировать и авторизовать пользователя.
 
-При регистрации пользователь получает роль `пользователя` (`is_admin = False`), а также стандартные права, которые выдаются зарегистрированному пользователю по дефолту.
+При регистрации клиент получает роль `пользователя` (`is_admin = False`), а также стандартную подписку.
 
-Администраторов сервиса авторизации необходимо добавлять в базу ручками (например администраторами сервиса авторизации). 
+За создание и состав подписок будет отвечать отдельный сервис (TBD). В рамках которого, у его администраторов, будет возможность создавать и реализовывать бизнес-логику подписок. 
 
 ## Описание структуры репозитория:
 ---
@@ -145,113 +163,6 @@ Cервис авторизации предоставляет возможнос
 Установим `pre-commit hook`:
 
     pre-commit install
-
-## Пример использования реализованных `endpoint`-ов:
----
-
-Импорт необходимых библиотек:
-
-    import requests
-    import json
-
-### Регистрация /api/v1/signup
-
-    data = {
-        'login': 'ba',
-        'password': '12345678',
-        'email': 'test@yandex.ru'
-    }
-    port = 80
-
-    response = requests.post(
-        url=f'http://127.0.0.1:{port}/api/v1/signup',
-        json=data
-    )
-    
-    print(response, json.loads(response.text))
-
-### Вход /api/v1/signin
-
-    response = requests.post(
-        url=f'http://127.0.0.1:{port}/api/v1/signin',
-        json=data
-    )
-    
-    print(response, json.loads(response.text))
-
-    result = response.cookies.get_dict()
-
-### Обновление access токена /api/v1/refresh
-
-    refresh_cookies = {
-        "refresh_token_cookie": result["refresh_token_cookie"],
-    }
-
-    response = requests.post(
-        url=f'http://127.0.0.1:{port}/api/v1/refresh',
-        cookies=refresh_cookies,
-    )
-
-    print(response, json.loads(response.text))
-
-### Выход из устройства /api/v1/signout
-
-    headers = {
-        "Authorization": f"Bearer {result['access_token_cookie']}",
-    }
-
-    response = requests.post(
-        url=f'http://127.0.0.1:{port}/api/v1/signout',
-        headers=headers,
-        json={
-            'refresh_token': result['refresh_token_cookie'],
-        }
-    )
-
-    print(response, json.loads(response.text))
-
-### Выход со всех устройств /api/v1/signout/all
-
-    headers = {
-        "Authorization": f"Bearer {result['access_token_cookie']}",
-    }
-
-    response = requests.post(
-        url=f'http://127.0.0.1:{port}/api/v1/signout/all',
-        headers=headers,
-    )
-
-    print(response, json.loads(response.text))
-
-### Смена пароля /api/v1/password/change
-
-    headers = {
-        "Authorization": f"Bearer {result['access_token_cookie']}",
-    }
-
-    response = requests.post(
-        url=f'http://127.0.0.1:{port}/api/v1/password/change',
-        headers=headers,
-        json={
-            'old_password': '123456',
-            'new_password': '12345678'
-        }
-    )
-
-    response, json.loads(response.text)
-
-### История действий пользователя /api/v1/history
-
-    headers = {
-        "Authorization": f"Bearer {result['access_token_cookie']}",
-    }
-
-    response = requests.get(
-        url=f'http://127.0.0.1:{port}/api/v1/history',
-        headers=headers,
-    )
-
-    print(response, json.loads(response.text))
 
 ## CI-CD
 ---

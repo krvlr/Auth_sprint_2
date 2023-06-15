@@ -24,6 +24,12 @@ responses:
   200:
     description: Пользователь успешно вошел в систему. Access и Refresh токены вовзращаются в cookie (c флагом httpopnly=True) под ключами refresh_token_cookie и access_token_cookie (а также в body ответа).
   400:
-    description: Пользователю не удается войти из-за неверных данных запроса.
+    description: Произошла ошибка при попытке залогиниться.
   401:
     description: Пользователь предоставляет неверные учетные данные.
+  405:
+    description: Метод не разрешен для запрошенного URL.
+  415:
+    description: Ошибка формата входных данных.
+  422:
+    description: Ошибка состава запроса.

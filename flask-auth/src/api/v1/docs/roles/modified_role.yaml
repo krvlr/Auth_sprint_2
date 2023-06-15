@@ -1,0 +1,43 @@
+Изменение подписки
+---
+description: Endpoint для актуализации подписок.
+tags:
+  - Сервис управления подписками.
+parameters:
+  - name: name
+    in: path
+    description: Название подписки
+    required: true
+    type: string
+  - name: body
+    description: Тело запроса должно содержать все необходимые для изменения подписки данные.
+    in: body
+    required: true
+    schema:
+      type: object
+      required:
+        - "new_name"
+        - "new_description"
+      properties:
+        new_name:
+          type: string
+          example: "super-puper-prime"
+        new_description:
+          type: string
+          example: "Super-puper-default subscription for super-gey-gunners!"
+  - name: Authorization
+    in: header
+    description: В заголовке Authorization запроса должен присутствовать Access токен (Bearer <access_token>)
+    required: true
+    type: string
+responses:
+  200:
+    description: Администратор успешно изменил подписку.
+  400:
+    description: Произошла ошибка при попытке изменить подписку.
+  403:
+    description: Отсутствуют права администратора.
+  415:
+    description: Ошибка формата входных данных.
+  422:
+    description: Ошибка состава запроса.

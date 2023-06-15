@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
-from flask import Blueprint, jsonify
+from flasgger import swag_from
+from flask import Blueprint, current_app, jsonify
 from flask_jwt_extended import current_user, get_jti, get_jwt, jwt_required
 from models.auth_models import (
     AuthResponse,
@@ -24,7 +25,6 @@ from utils.exceptions import (
 )
 from utils.rate_limit import limit_leaky_bucket
 from utils.user_action import log_action
-from flasgger import swag_from
 
 auth_bp = Blueprint("auth", __name__)
 auth_service = get_auth_service()
@@ -41,7 +41,6 @@ def signup():
             email=body.email,
             password=body.password,
         )
-
         return jsonify(BaseResponse(data=user_data).dict()), HTTPStatus.CREATED
     except AccountSignupException as ex:
         return (
@@ -120,14 +119,14 @@ def password_change():
     try:
         body = get_data_from_body(PasswordChangeRequest)
 
-        response = auth_service.password_change(
+        auth_service.password_change(
             user=current_user,
             access_jti=get_jwt()["jti"],
             old_password=body.old_password,
             new_password=body.new_password,
         )
         return (
-            jsonify(BaseResponse(success=True, data=response).dict()),
+            jsonify(BaseResponse(success=True).dict()),
             HTTPStatus.OK,
         )
     except AccountPasswordChangeException as ex:

@@ -31,11 +31,7 @@ def backoff(start_sleep_time=0.1, factor=2, border_sleep_time=10):
         def retry(*args, **kwargs):
             n, t = 0, 0
             while True:
-                t = (
-                    start_sleep_time * factor**n
-                    if t < border_sleep_time
-                    else border_sleep_time
-                )
+                t = start_sleep_time * factor**n if t < border_sleep_time else border_sleep_time
 
                 try:
                     n += 1
