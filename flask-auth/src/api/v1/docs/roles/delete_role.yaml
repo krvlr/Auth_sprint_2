@@ -1,0 +1,27 @@
+Удаление подписки
+---
+description: Endpoint для удаления неактуальных подписок.
+tags:
+  - Сервис управления подписками.
+parameters:
+  - name: name
+    in: path
+    description: Название подписки
+    required: true
+    type: string
+  - name: Authorization
+    in: header
+    description: В заголовке Authorization запроса должен присутствовать Access токен (Bearer <access_token>)
+    required: true
+    type: string
+responses:
+  200:
+    description: Администратор успешно удалил неактуальную подписку.
+  400:
+    description: Произошла ошибка при попытке удалить неактуальную подписку.
+  403:
+    description: Отсутствуют права администратора.
+  415:
+    description: Ошибка формата входных данных.
+  422:
+    description: Ошибка состава запроса.

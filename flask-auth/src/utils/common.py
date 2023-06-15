@@ -32,7 +32,9 @@ def check_is_admin(func: Callable):
     @wraps(func)
     def wrapper(*args, **kwargs):
         if get_jwt()["sub"]["is_admin"] == "False":
-            abort(HTTPStatus.FORBIDDEN, description="Доступ запрещен, требуются админские права!")
+            abort(
+                HTTPStatus.FORBIDDEN, description="Доступ запрещен, требуются права администратора!"
+            )
         return func(*args, **kwargs)
 
     return wrapper

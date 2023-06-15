@@ -1,0 +1,38 @@
+Добавление подписки пользователю
+---
+description: Endpoint для добавления подписки пользователю.
+tags:
+  - Сервис управления подписками.
+parameters:
+  - name: name
+    in: path
+    description: Название подписки
+    required: true
+    type: string
+  - name: body
+    description: Тело запроса должно содержать все необходимые для добавления подписки пользователю данные.
+    in: body
+    required: true
+    schema:
+      type: object
+      required:
+        - "user_id"
+      properties:
+        user_id:
+          type: string
+  - name: Authorization
+    in: header
+    description: В заголовке Authorization запроса должен присутствовать Access токен (Bearer <access_token>)
+    required: true
+    type: string
+responses:
+  200:
+    description: Администратор успешно добавил подписку пользователю.
+  400:
+    description: Произошла ошибка при попытке добавить новую подписку пользователю.
+  403:
+    description: Отсутствуют права администратора.
+  415:
+    description: Ошибка формата входных данных.
+  422:
+    description: Ошибка состава запроса.

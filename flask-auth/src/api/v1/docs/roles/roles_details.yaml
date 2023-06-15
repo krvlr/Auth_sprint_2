@@ -1,0 +1,22 @@
+Получение информации по подпискам
+---
+description: Endpoint для уточнения информации о всех доступных подписках.
+tags:
+  - Сервис управления подписками.
+parameters:
+  - name: Authorization
+    in: header
+    description: В заголовке Authorization запроса должен присутствовать Access токен (Bearer <access_token>)
+    required: true
+    type: string
+responses:
+  200:
+    description: Администратор успешно получил информацию о всех доступных подписках.
+  400:
+    description: Произошла ошибка при попытке получить информацию о всех доступных подписках.
+  403:
+    description: Отсутствуют права администратора.
+  415:
+    description: Ошибка формата входных данных.
+  422:
+    description: Ошибка состава запроса.

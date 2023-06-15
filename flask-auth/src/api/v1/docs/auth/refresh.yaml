@@ -3,8 +3,6 @@
 description: Endpoint для обновления Access токена пользователя в системе.
 tags:
   - Сервис аутентификации.
-#security:
-#  - bearerAuth: []
 parameters:
   - name: Authorization
     in: header
@@ -16,5 +14,9 @@ responses:
     description: Пользователь успешно обновил Access токен.
   400:
     description: Произошла ошибка при попытке обновить Access токен.
+  405:
+    description: Метод не разрешен для запрошенного URL.
+  415:
+    description: Ошибка формата входных данных.
   422:
-    description: Произошла ошибка валидации Refresh токена.
+    description: Ошибка состава запроса.
