@@ -51,7 +51,7 @@ def make_get_request(session, redis_client):
 @pytest_asyncio.fixture(scope="function")
 def make_post_request(session, redis_client):
     async def inner(
-        endpoint: str, data: dict = {}, token: str = None, flush_cache: bool = True
+        endpoint: str, data: dict = None, token: str = None, flush_cache: bool = True
     ) -> HttpResponse:
         if flush_cache:
             await redis_client.flushall()
@@ -62,7 +62,7 @@ def make_post_request(session, redis_client):
         }
         url = f"{auth_api_settings.get_api_uri()}/{endpoint}"
 
-        async with session.post(url, json=data, headers=headers) as response:
+        async with session.post(url, json=data if data else dict(), headers=headers) as response:
             body = await response.read()
             return HttpResponse(
                 status=response.status,

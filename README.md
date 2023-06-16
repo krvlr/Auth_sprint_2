@@ -17,7 +17,9 @@ https://github.com/krvlr/Auth_sprint_2
 - `/api/v1/password/change` - изменение пароля аутентифицированного пользователя,
 - `/api/v1/signout` - выход из устройства аутентифицированным пользователем (при наличии свежего `Acccess` токена),
 - `/api/v1/signout/all` - выход из устройства аутентифицированным пользователем (при наличии свежего `Acccess` токена).
-- `/api/v1/history` - получение списка действий текущего аутентифицированного пользователя (при наличии свежего `Acccess` токена).
+- `/api/v1/history` - получение списка действий текущего аутентифицированного пользователя (при наличии свежего `Acccess` токена),
+- `/api/v1/google/signin`, `/api/v1/google/callback` - вход в google аккаунт,
+- `/api/v1/yandex/signin`, `/api/v1/yandex/callback` - вход в yandex аккаунт.
 
 В рамках сервиса управления подписками реализованы следующие `endpoint`-ы:
 
@@ -70,6 +72,7 @@ Cервис авторизации предоставляет возможнос
     AUTH_DB_PASSWORD
     AUTH_REDIS_HOST
     AUTH_REDIS_PORT
+    FLASK_SECRET_KEY
     JWT_COOKIE_SECURE
     JWT_TOKEN_LOCATION
     JWT_SECRET_KEY
@@ -78,8 +81,20 @@ Cервис авторизации предоставляет возможнос
     INITIAL_USER_ROLES
     INITIAL_USER_DESCRIPTION_ROLES
     DEFAULT_USER_ROLE
+    JAEGER_HOST
+    JAEGER_PORT
+    AUTH_HEALTHCHECK_REQUEST_ID
+    REQUEST_LIMIT_PER_MINUTE
     LOGGING_LEVEL
     LOG_FORMAT
+    GOOGLE_CLIENT_ID
+    GOOGLE_CLIENT_SECRET
+    GOOGLE_CONF_URL
+    YANDEX_CLIENT_ID
+    YANDEX_CLIENT_SECRET
+    YANDEX_ACCESS_TOKEN_URL
+    YANDEX_AUTHORIZE_URL
+    YANDEX_USER_INFO_URL
 
 Теперь можно запустить сборку образа и запуск контейнеров:
 
