@@ -15,6 +15,7 @@ from flasgger import Swagger
 from flask import Flask, jsonify, request
 from flask_jwt_extended import JWTManager
 from models.common import BaseResponse
+from utils.click_commands import create_admin
 from utils.exceptions import add_base_exceptions_handlers
 from utils.jaeger_config import configure_jaeger_tracer
 
@@ -58,6 +59,8 @@ def create_app():
         return User.query.filter_by(id=jwt_data["sub"]["id"]).one_or_none()
 
     init_db(app)
+
+    app.cli.add_command(create_admin)
 
     return app
 
