@@ -27,6 +27,7 @@ from core.config import jaeger_settings
 from core.logger import LOGGER_CONFIG
 from db import init_db, alchemy
 from db.models.user import User, Role
+from utils.click_commands import create_admin
 from utils.exceptions import add_base_exceptions_handlers
 from utils.jaeger_config import configure_jaeger_tracer
 
@@ -97,6 +98,8 @@ def create_app():
         }
     )
     oauth.register("yandex")
+
+    app.cli.add_command(create_admin)
 
     return app
 
