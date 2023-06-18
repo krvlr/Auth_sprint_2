@@ -23,7 +23,7 @@ class AuthService:
     def __init__(self, token_storage_adapter: TokenStorageAdapter):
         self.token_storage = token_storage_adapter
 
-    def create_jwt_tokens(self, user: User, device_info: str) -> dict:
+    def _create_jwt_tokens(self, user: User, device_info: str) -> dict:
         identity = dict(
             JwtPayload(
                 id=str(user.id),
@@ -83,7 +83,7 @@ class AuthService:
         user = User.query.filter_by(login=login).one_or_none()
 
         if user and user.verify_password(password):
-            return self.create_jwt_tokens(
+            return self._create_jwt_tokens(
                 user=user,
                 device_info=request.user_agent.string,
             )
@@ -100,7 +100,7 @@ class AuthService:
 
         self.token_storage.block(user_id=str(user.id), jti=refresh_jti)
 
-        return self.create_jwt_tokens(user=user, device_info=device_info)
+        return self._create_jwt_tokens(user=user, device_info=device_info)
 
     def password_change(
         self,
@@ -178,6 +178,6 @@ class AuthService:
         }
 
 
-@lru_cache()
+@lru_cache
 def get_auth_service(token_storage_adapter: TokenStorageAdapter = get_redis_adapter()):
     return AuthService(token_storage_adapter=token_storage_adapter)

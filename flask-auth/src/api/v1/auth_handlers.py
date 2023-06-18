@@ -30,7 +30,7 @@ auth_bp = Blueprint("auth", __name__)
 auth_service = get_auth_service()
 
 
-@auth_bp.route("/api/v1/signup", methods=["POST"])
+@auth_bp.route("/signup", methods=["POST"])
 @log_action
 @swag_from("docs/auth/signup.yaml")
 def signup():
@@ -49,7 +49,7 @@ def signup():
         )
 
 
-@auth_bp.route("/api/v1/signin", methods=["POST"])
+@auth_bp.route("/signin", methods=["POST"])
 @log_action
 @swag_from("docs/auth/signin.yaml")
 def signin():
@@ -78,7 +78,7 @@ def signin():
         )
 
 
-@auth_bp.route("/api/v1/refresh", methods=["POST"])
+@auth_bp.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True)
 @limit_leaky_bucket
 @log_action
@@ -110,7 +110,7 @@ def refresh():
         )
 
 
-@auth_bp.route("/api/v1/password/change", methods=["POST"])
+@auth_bp.route("/password/change", methods=["POST"])
 @jwt_required()
 @limit_leaky_bucket
 @log_action
@@ -136,7 +136,7 @@ def password_change():
         )
 
 
-@auth_bp.route("/api/v1/signout", methods=["POST"])
+@auth_bp.route("/signout", methods=["POST"])
 @jwt_required()
 @limit_leaky_bucket
 @log_action
@@ -159,7 +159,7 @@ def signout():
         )
 
 
-@auth_bp.route("/api/v1/signout/all", methods=["POST"])
+@auth_bp.route("/signout/all", methods=["POST"])
 @jwt_required()
 @limit_leaky_bucket
 @log_action
@@ -176,7 +176,7 @@ def signout_all():
         )
 
 
-@auth_bp.route("/api/v1/history", methods=["GET"])
+@auth_bp.route("/history", methods=["GET"])
 @jwt_required()
 @limit_leaky_bucket
 @swag_from("docs/auth/history.yaml")
@@ -198,6 +198,6 @@ def history():
         )
 
 
-@auth_bp.route("/api/v1/health", methods=["GET"])
+@auth_bp.route("/health", methods=["GET"])
 def health_check():
     return jsonify(BaseResponse().dict()), HTTPStatus.OK
