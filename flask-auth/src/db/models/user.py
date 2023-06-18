@@ -85,8 +85,36 @@ class User(alchemy.Model):
         )
 
 
+def create_partitions(target, connection, **kwargs):
+    connection.execute(
+        """
+        DO $$
+        BEGIN
+            FOR d IN 0..365 loop
+                EXECUTE format(
+                    'CREATE table if not exists %I PARTITION OF %I
+                    FOR VALUES FROM (%L)
+                    TO (%L)',
+                    concat('user_actions_history', to_char(CURRENT_DATE + d, 'YYMMDD')),
+                    'user_actions_history',
+                    CURRENT_DATE + d,
+                    CURRENT_DATE + (d+1)
+                );
+            END LOOP;
+        END $$;
+        """
+    )
+
+
 class UserActionsHistory(alchemy.Model):
     __tablename__ = "user_actions_history"
+    __table_args__ = (
+        UniqueConstraint('id', 'created'),
+        {
+            "postgresql_partition_by": "RANGE (created)",
+            "listeners": [("after_create", create_partitions)],
+        },
+    )
 
     id = Column(
         UUID(as_uuid=True),
@@ -113,11 +141,11 @@ class UserActionsHistory(alchemy.Model):
     )
     device_info = Column(
         String(255),
-        primary_key=False,
         comment="Информация о устройстве",
     )
     created = Column(
         DateTime,
+        primary_key=True,
         nullable=False,
         default=func.now(),
         comment="Время создания записи",
