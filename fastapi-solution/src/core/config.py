@@ -24,6 +24,7 @@ class Settings(BaseSettings):
 
 
 class JaegerSettings(BaseSettings):
+    enable_tracer: bool = Field(default=True, env="ENABLE_TRACER")
     host: str = Field(default="127.0.0.1", env="JAEGER_HOST")
     port: int = Field(default=6831, env="JAEGER_PORT")
 

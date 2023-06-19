@@ -13,57 +13,45 @@ from utils.exceptions import AccountSigninException
 from utils.user_action import log_action
 
 oauth = OAuth()
-
-google_oauth_bp = Blueprint("google_oauth", __name__, url_prefix="/google")
-yandex_oauth_bp = Blueprint("yandex_oauth", __name__, url_prefix="/yandex")
-
 oauth_service = get_oauth_service()
 
-
-@google_oauth_bp.route("/signin", methods=["GET"])
-def google_signin():
-    redirect_uri = url_for("api_auth.google_oauth.google_signin_callback", _external=True)
-    return oauth.google.authorize_redirect(redirect_uri), HTTPStatus.OK
+oauth_bp = Blueprint("social_oauth", __name__, url_prefix="/social")
 
 
-@google_oauth_bp.route("/callback", methods=["GET"])
+@oauth_bp.route("/signin/<type>", methods=["GET"])
+def signin(type):
+    redirect_uri = url_for("api_auth.social_oauth.signin_callback", _external=True, type=type)
+
+    match type:
+        case "google":
+            return oauth.google.authorize_redirect(redirect_uri), HTTPStatus.OK
+        case "yandex":
+            return oauth.yandex.authorize_redirect(redirect_uri), HTTPStatus.OK
+        case other_type:
+            return (
+                jsonify(
+                    BaseResponse(
+                        success=False, error=f"Сервис {other_type} не поддерживается"
+                    ).dict()
+                ),
+                HTTPStatus.UNAUTHORIZED,
+            )
+
+
+@oauth_bp.route("/callback/<type>", methods=["GET"])
 @log_action
-def google_signin_callback():
+def signin_callback(type):
     try:
-        token = oauth.google.authorize_access_token()
-        user = GoogleUser(**token["userinfo"])
-
-        oauth_data = AuthResponse(**oauth_service.signin_social_user(user))
-        response = jsonify(BaseResponse(data=dict(oauth_data)).dict())
-
-        set_jwt_in_cookie(
-            response=response,
-            access_token=oauth_data.access_token,
-            refresh_token=oauth_data.refresh_token,
-        )
-        return response, HTTPStatus.OK
-
-    except AccountSigninException as ex:
-        return (
-            jsonify(BaseResponse(success=False, error=ex.error_message).dict()),
-            HTTPStatus.UNAUTHORIZED,
-        )
-
-
-@yandex_oauth_bp.route("/signin", methods=["GET"])
-def yandex_signin():
-    url = url_for("api_auth.yandex_oauth.yandex_signin_callback", _external=True)
-    return oauth.yandex.authorize_redirect(url), HTTPStatus.OK
-
-
-@yandex_oauth_bp.route("/callback", methods=["GET"])
-@log_action
-def yandex_signin_callback():
-    try:
-        oauth.yandex.authorize_access_token()
-
-        user_info = oauth.yandex.get(oauth_yandex_settings.user_info_url)
-        user = YandexUser(**user_info.json())
+        match type:
+            case "google":
+                token = oauth.google.authorize_access_token()
+                user = GoogleUser(**token["userinfo"])
+            case "yandex":
+                oauth.yandex.authorize_access_token()
+                user_info = oauth.yandex.get(oauth_yandex_settings.user_info_url)
+                user = YandexUser(**user_info.json())
+            case other_type:
+                raise AccountSigninException(error_message=f"Сервис {other_type} не поддерживается")
 
         oauth_data = AuthResponse(**oauth_service.signin_social_user(user))
         response = jsonify(BaseResponse(data=dict(oauth_data)).dict())
