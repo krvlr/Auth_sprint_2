@@ -11,10 +11,13 @@ from db.models.user import User, Role
 from db.token_storage_adapter import TokenStorageAdapter, get_redis_adapter
 from models.auth_models import JwtPayload
 from models.oauth_models import SocialUser
+from services.auth_service import get_auth_service
 from utils.exceptions import (
     AccountSigninException,
     AccountSignupException,
 )
+
+auth_service = get_auth_service()
 
 
 class OAuthService:
@@ -25,33 +28,6 @@ class OAuthService:
     def _create_random_password() -> str:
         characters = string.ascii_letters + string.digits + string.punctuation
         return "".join(random.choice(characters) for i in range(10))
-
-    def _signin(self, user: User, device_info: str) -> dict:
-        identity = dict(
-            JwtPayload(
-                id=str(user.id),
-                device_info=device_info,
-                is_active=user.is_active,
-                is_verified=user.is_verified,
-                is_admin=user.is_admin,
-                roles=user.get_roles(),
-            )
-        )
-
-        access_token = create_access_token(identity=identity)
-        self.token_storage.create(
-            user_id=str(user.id),
-            jti=get_jti(access_token),
-            delta_expire=current_app.config["JWT_ACCESS_TOKEN_EXPIRES"],
-        )
-
-        refresh_token = create_refresh_token(identity=identity)
-        self.token_storage.create(
-            user_id=str(user.id),
-            jti=get_jti(refresh_token),
-            delta_expire=current_app.config["JWT_REFRESH_TOKEN_EXPIRES"],
-        )
-        return dict(access_token=access_token, refresh_token=refresh_token)
 
     def _signup(
         self,
@@ -88,7 +64,7 @@ class OAuthService:
         if not user_db:
             user_db = self._signup(name=user.name, email=user.email, social_id=user.sub)
 
-        return self._signin(user_db, device_info=request.user_agent.string)
+        return auth_service.create_jwt_tokens(user_db, device_info=request.user_agent.string)
 
 
 @lru_cache

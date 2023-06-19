@@ -6,8 +6,13 @@ from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
 
+from core.config import jaeger_settings
+
 
 def configure_jaeger_tracer(app: FastAPI, host: str, port: int) -> None:
+    if not jaeger_settings.enable_tracer:
+        return
+
     trace.set_tracer_provider(
         TracerProvider(resource=Resource.create({SERVICE_NAME: "Elastic API"}))
     )

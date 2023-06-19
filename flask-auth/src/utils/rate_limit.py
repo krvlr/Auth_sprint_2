@@ -33,7 +33,7 @@ def limit_leaky_bucket(func):
                 jsonify(BaseResponse(success=False, error="Слишком много запросов").dict()),
                 HTTPStatus.TOO_MANY_REQUESTS,
             )
-        else:
-            return func()
+
+        return func()
 
     return wrapper

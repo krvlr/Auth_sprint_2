@@ -22,6 +22,7 @@ def get_user_id_from_response_jwt(response):
     )
 
 
+# FYI (delete) запись истории действий пользователя (в том числе входа) реализована здесь!!!
 def log_action(func) -> Callable:
     @wraps(func)
     def wrapper(*args, **kwargs):
